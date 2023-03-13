@@ -46,6 +46,7 @@
       ////////////// VARIABLES ///////////////////////
       ////////////////////////////////////////////////
 
+      // delclaring variables here to make them global
       let wsClient = null; // The client-side WebSocket connection variable: new WebSocket()
       let clientPlayerIndex = null; // The index value of the client: 0 | 1 | 2 | 3
       let potatoHolderIndex = null; // The index value of the current holder of the potato: 0 | 1 | 2 | 3
@@ -85,14 +86,21 @@
 
         // TODO: Create a new WebSocket connection with the server using the ws protocol
         const URL = "ws://localhost:" + PORT;
+
         // Websocket connection to the server at the specified URL
-        // new WebSocket(URL) creates a new WebSocket connection to the server at the specified URL
+        // forms connection using browser's WebSocket API
+        // creates a new WebSocket client object that connects to the server at the specified URL
+        // forms client-side connection to the server
         wsClient = new WebSocket(URL);
 
         // TODO: Define the .onopen() handler
+        // event handler that is called when the connection is established
+        // when the connection is established, send the server a 'NEW_USER' message
+        // send custom message to the server to indicate that a new user has joined the game
         wsClient.onopen = () => {
           console.log("Connection to the WebSocket Server Established!");
           // TODO: Send the server a 'NEW_USER' message
+          // payload not required here
           const data = {
             type: CLIENT.MESSAGE.NEW_USER,
           };
