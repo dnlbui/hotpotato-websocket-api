@@ -39,12 +39,33 @@ const server = http.createServer((req, res) => {
 ///////////////////////////////////////////////
 
 // TODO: Create the WebSocket Server (ws) using the HTTP server
-
+const wsServer = new WebSocket.Server({ server }); 
 
 // TODO: Define the websocket server 'connection' handler
-// TODO: Define the socket 'message' handler
-  // 'NEW_USER' => handleNewUser(socket)
-  // 'PASS_POTATO' => passThePotatoTo(newPotatoHolderIndex)
+wsServer.on('connection', (socket) => {
+  console.log('A new client has connected to the server!');
+
+  // TODO: Define the socket 'message' handler
+  socket.on('message', (data) => {
+    console.log(data);
+  
+    const { type, payload } = JSON.parse(data);
+  
+    switch (type) {
+      // 'NEW_USER' => handleNewUser(socket)
+      case 'NEW_USER':
+        handleNewUser(socket);
+        break;
+      // 'PASS_POTATO' => passThePotatoTo(newPotatoHolderIndex)
+      case 'PASS_POTATO':
+        passThePotatoTo(payload.newPotatoHolderIndex);
+        break;
+      default:
+        break;
+    }
+  })
+})
+
 
 
 ///////////////////////////////////////////////
@@ -52,7 +73,17 @@ const server = http.createServer((req, res) => {
 ///////////////////////////////////////////////
 
 // TODO: Implement the broadcast pattern
-
+broadcast = (data, socketToOmit) => {
+  // iterate over the connected clients and send the data to each one
+  // wsServer.clients is an array of all connected clients
+  wsServer.clients.forEach((connectedClient) => {
+    // Make sure the client is open and not the socket that sent the data
+    if (connectedClient.readyState === WebSocket.OPEN && connectedClient !== socketToOmit) {\
+      // Send the data to the connected client
+      connectedClient.send(data);
+    }
+  });
+}
 
 function handleNewUser(socket) {
   // Until there are 4 players in the game....
