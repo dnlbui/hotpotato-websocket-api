@@ -44,14 +44,17 @@ const wsServer = new WebSocket.Server({ server });
 
 // TODO: Define the websocket server 'connection' handler
 // event handler for when a new client connects to the server. 
-// prepares it to respond to client connection events/ messages
+// prepares it to respond to client connection events then messages
+// socket represents the connection between the server and the client 
 wsServer.on('connection', (socket) => {
   console.log('A new client has connected to the server!');
 
   // TODO: Define the socket 'message' handler
   socket.on('message', (data) => {
-    console.log(data);
-  
+    console.log(JSON.parse(data));
+    //console.log(socket);
+    
+    // Destructure the type and payload from the parsed JSON string data
     const { type, payload } = JSON.parse(data);
   
     switch (type) {
@@ -81,7 +84,7 @@ broadcast = (data, socketToOmit) => {
   // wsServer.clients is an array of all connected clients
   wsServer.clients.forEach((connectedClient) => {
     // Make sure the client is open and not the socket that sent the data
-    if (connectedClient.readyState === WebSocket.OPEN && connectedClient !== socketToOmit) {\
+    if (connectedClient.readyState === WebSocket.OPEN && connectedClient !== socketToOmit) {
       // Send the data to the connected client
       connectedClient.send(data);
     }
@@ -92,7 +95,11 @@ function handleNewUser(socket) {
   // Until there are 4 players in the game....
   if (nextPlayerIndex < 4) {
     // TODO: Send PLAYER_ASSIGNMENT to the socket with a clientPlayerIndex
-    
+    // .send sends a message to the client that is connected to the socket 
+    socket.send(JSON.stringify({
+      type: SERVER.MESSAGE.PLAYER_ASSIGNMENT,
+      payload: { clientPlayerIndex: nextPlayerIndex }
+    }))
     
     // Then, increment the number of players in the game
     nextPlayerIndex++;
