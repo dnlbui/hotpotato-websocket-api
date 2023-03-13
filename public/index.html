@@ -85,7 +85,8 @@
 
         // TODO: Create a new WebSocket connection with the server using the ws protocol
         const URL = "ws://localhost:" + PORT;
-        // Websocket
+        // Websocket connection to the server at the specified URL
+        // new WebSocket(URL) creates a new WebSocket connection to the server at the specified URL
         wsClient = new WebSocket(URL);
 
         // TODO: Define the .onopen() handler
@@ -131,9 +132,11 @@
       ////////////////////////////////////////////////
       //////////// DOM HELPER FUNCTIONS //////////////
       ////////////////////////////////////////////////
+      // will not need to modify these functions
 
       const display = document.getElementById("display");
 
+      // Updates the display text and background color
       function updateDisplay(displayText, backgroundColor) {
         display.innerHTML = displayText;
         if (backgroundColor) {
@@ -157,6 +160,8 @@
         // remove the hasPotato class from any existing elements that have it
         potatoHolderIndex = newPotatoHolderIndex;
         playerElements.forEach((playerElement, i) => {
+          //.childNodes returns a collection of an element's child nodes, as a NodeList object.
+          // .childNodes[0] returns the first child node of the specified element
           const playerAvatar = playerElement.childNodes[0];
           playerAvatar.src =
             i === potatoHolderIndex
