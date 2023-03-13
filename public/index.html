@@ -101,11 +101,12 @@
           console.log("Connection to the WebSocket Server Established!");
           // TODO: Send the server a 'NEW_USER' message
           // payload not required here
-          const data = {
+          const customMessage = {
+            // Uses constant variable to send the string value of 'NEW_USER' to the server
             type: CLIENT.MESSAGE.NEW_USER,
           };
 
-          wsClient.send(JSON.stringify(data));
+          wsClient.send(JSON.stringify(customMessage));
         };
 
         // TODO: Define the .onmessage() handler
