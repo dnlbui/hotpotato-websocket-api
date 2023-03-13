@@ -39,9 +39,12 @@ const server = http.createServer((req, res) => {
 ///////////////////////////////////////////////
 
 // TODO: Create the WebSocket Server (ws) using the HTTP server
+// server is the HTTP server the websocket server will use
 const wsServer = new WebSocket.Server({ server }); 
 
 // TODO: Define the websocket server 'connection' handler
+// event handler for when a new client connects to the server. 
+// prepares it to respond to client connection events/ messages
 wsServer.on('connection', (socket) => {
   console.log('A new client has connected to the server!');
 
