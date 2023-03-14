@@ -59,11 +59,11 @@ wsServer.on('connection', (socket) => {
   
     switch (type) {
       // 'NEW_USER' => handleNewUser(socket)
-      case 'NEW_USER':
+      case CLIENT.MESSAGE.NEW_USER:
         handleNewUser(socket);
         break;
       // 'PASS_POTATO' => passThePotatoTo(newPotatoHolderIndex)
-      case 'PASS_POTATO':
+      case CLIENT.MESSAGE.PASS_POTATO:
         passThePotatoTo(payload.newPotatoHolderIndex);
         break;
       default:
@@ -79,14 +79,19 @@ wsServer.on('connection', (socket) => {
 ///////////////////////////////////////////////
 
 // TODO: Implement the broadcast pattern
-broadcast = (data, socketToOmit) => {
+const broadcast = (data, socketToOmit) => {
   // iterate over the connected clients and send the data to each one
-  // wsServer.clients is an array of all connected clients
+  // wsServer.clients is an array of all the connected clients
   wsServer.clients.forEach((connectedClient) => {
     // Make sure the client is open and not the socket that sent the data
+    // .send sends a message to the client that is connected to the socket 
+    // serialize the data with JSON.stringify
+    // in this case, the socketToOmit is the socket that sent the data but not used in this application
     if (connectedClient.readyState === WebSocket.OPEN && connectedClient !== socketToOmit) {
       // Send the data to the connected client
-      connectedClient.send(data);
+      connectedClient.send(
+        JSON.stringify(data)
+      );
     }
   });
 }
@@ -96,10 +101,13 @@ function handleNewUser(socket) {
   if (nextPlayerIndex < 4) {
     // TODO: Send PLAYER_ASSIGNMENT to the socket with a clientPlayerIndex
     // .send sends a message to the client that is connected to the socket 
-    socket.send(JSON.stringify({
-      type: SERVER.MESSAGE.PLAYER_ASSIGNMENT,
-      payload: { clientPlayerIndex: nextPlayerIndex }
-    }))
+    // serialize the data with JSON.stringify
+    socket.send(JSON.stringify(
+      {
+        type: SERVER.MESSAGE.PLAYER_ASSIGNMENT,
+        payload: { clientPlayerIndex: nextPlayerIndex }
+      }
+    ))
     
     // Then, increment the number of players in the game
     nextPlayerIndex++;
@@ -118,15 +126,18 @@ function handleNewUser(socket) {
   // If 4 players are already in the game...
   else {
     // TODO: Send GAME_FULL to the socket
-    
-
+    socket.send(JSON.stringify({type: SERVER.MESSAGE.GAME_FULL}))
   }
 }
 
 
 function passThePotatoTo(newPotatoHolderIndex) {
   // TODO: Broadcast a NEW_POTATO_HOLDER message with the newPotatoHolderIndex
-  
+  const data = {
+    type: SERVER.BROADCAST.NEW_POTATO_HOLDER,
+    payload: { newPotatoHolderIndex }
+  }
+  broadcast(data);
 }
 
 function startTimer() {
@@ -149,7 +160,7 @@ function startTimer() {
       nextPlayerIndex = 0; // reset the players index
       
       // TODO: Broadcast 'GAME_OVER'
-   
+
     }
   }, 1000);
 }
