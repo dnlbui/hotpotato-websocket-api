@@ -127,11 +127,11 @@
               );
               break;
             // 'PLAYER_ASSIGNMENT' => setPlayerIndex(playerIndex)
-            case "PLAYER_ASSIGNMENT":
+            case SERVER.MESSAGE.PLAYER_ASSIGNMENT:
               setPlayerIndex(payload.clientPlayerIndex);
               break;
             // 'COUNTDOWN' => countDown(clockValue)
-            case "COUNTDOWN":
+            case SERVER.BROADCAST.COUNTDOWN:
               break;
             // 'NEW_POTATO_HOLDER' => updateCurrentPotatoHolder(newPotatoHolderIndex)
             case SERVER.BROADCAST.NEW_POTATO_HOLDER:
@@ -141,7 +141,7 @@
               updateCurrentPotatoHolder(payload.newPotatoHolderIndex);
               break;
             // 'GAME_OVER' => endGame()
-            case "GAME_OVER":
+            case SERVER.BROADCAST.GAME_OVER:
               break;
             default:
               console.log(
