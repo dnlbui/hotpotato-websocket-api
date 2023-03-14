@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/public/styles.css" />
     <link rel="icon" href="/public/favicon.ico" type="image/x-icon" />
+    <!-- IMPORTS CONSTANTS  -->
     <script src="/utils/constants.js"></script>
     <title>Hot Potato</title>
   </head>
@@ -60,6 +61,10 @@
       const playerElements = [...document.getElementsByClassName("player")];
 
       // make each other player clickable
+      // playerIndex is the index of the player in the playerColors array
+      // .forEach() method executes a provided function once for each array element
+      // .forEach() method's first argument is a callback function that takes in the current element as its first argument
+      // .forEach() method's second argument is the index of the current element
       playerElements.forEach((playerElement, playerIndex) => {
         playerElement.onclick = function () {
           // Only allow clicks if the game is running, the client is holding the potato, and they didn't click on themselves
@@ -69,6 +74,7 @@
           ) {
             // and pass the potato
             passThePotatoTo(playerIndex);
+            console.log(`Player ${playerIndex} was clicked!`);
           }
         };
       });
@@ -110,12 +116,40 @@
         };
 
         // TODO: Define the .onmessage() handler
-        // For each message type below, call the appropriate helper the proper value
-        // 'GAME_FULL' => updateDisplay(displayText);
-        // 'PLAYER_ASSIGNMENT' => setPlayerIndex(playerIndex)
-        // 'COUNTDOWN' => countDown(clockValue)
-        // 'NEW_POTATO_HOLDER' => updateCurrentPotatoHolder(newPotatoHolderIndex)
-        // 'GAME_OVER' => endGame()
+        wsClient.onmessage = (messageEvent) => {
+          const { type, payload } = JSON.parse(messageEvent.data);
+          // For each message type below, call the appropriate helper the proper value
+          switch (type) {
+            // 'GAME_FULL' => updateDisplay(displayText);
+            case SERVER.MESSAGE.GAME_FULL:
+              updateDisplay(
+                "Players are at full compacity. Try to connect again when ongoing game is over."
+              );
+              break;
+            // 'PLAYER_ASSIGNMENT' => setPlayerIndex(playerIndex)
+            case "PLAYER_ASSIGNMENT":
+              setPlayerIndex(payload.clientPlayerIndex);
+              break;
+            // 'COUNTDOWN' => countDown(clockValue)
+            case "COUNTDOWN":
+              break;
+            // 'NEW_POTATO_HOLDER' => updateCurrentPotatoHolder(newPotatoHolderIndex)
+            case SERVER.BROADCAST.NEW_POTATO_HOLDER:
+              console.log(
+                `This player index is holding the potat: ${payload.newPotatoHolderIndex}`
+              );
+              updateCurrentPotatoHolder(payload.newPotatoHolderIndex);
+              break;
+            // 'GAME_OVER' => endGame()
+            case "GAME_OVER":
+              break;
+            default:
+              console.log(
+                `Error: Message (${type}) from server cannot be handled.`
+              );
+              break;
+          }
+        };
 
         // .onclose is executed when the socket connection is closed
         wsClient.onclose = function () {
@@ -136,6 +170,14 @@
         potatoHolderIndex = newPotatoHolderIndex;
 
         // TODO: Send the server a 'PASS_POTATO' message with the newPotatoHolderIndex
+        const customMessage = {
+          type: CLIENT.MESSAGE.PASS_POTATO,
+          payload: {
+            newPotatoHolderIndex,
+          },
+        };
+
+        wsClient.send(JSON.stringify(customMessage));
       }
 
       ////////////////////////////////////////////////
@@ -169,9 +211,15 @@
         // remove the hasPotato class from any existing elements that have it
         potatoHolderIndex = newPotatoHolderIndex;
         playerElements.forEach((playerElement, i) => {
-          //.childNodes returns a collection of an element's child nodes, as a NodeList object.
-          // .childNodes[0] returns the first child node of the specified element
-          const playerAvatar = playerElement.childNodes[0];
+          // .childNodes returns a collection of an element's child nodes, as a NodeList object.
+          // .childNodes[0] returns the first child node of the specified element but had a problem since it was a text node
+          // .childNodes[1] returns the second child node of the specified element which is the image
+          // *****in the future use querySelector to get the element or getElementsByTagName/ClassName/Id to get the element*******
+          let playerAvatar = playerElement.childNodes[1];
+
+          // playerAvatar.src returns the source URL of the image
+          // .replace() replaces a specified value with another value in a string
+          // .replace("COLD", "HOT") replaces the string "COLD" with the string "HOT"
           playerAvatar.src =
             i === potatoHolderIndex
               ? playerAvatar.src.replace("COLD", "HOT")
