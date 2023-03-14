@@ -132,6 +132,7 @@
               break;
             // 'COUNTDOWN' => countDown(clockValue)
             case SERVER.BROADCAST.COUNTDOWN:
+              countDown(payload.clockValue);
               break;
             // 'NEW_POTATO_HOLDER' => updateCurrentPotatoHolder(newPotatoHolderIndex)
             case SERVER.BROADCAST.NEW_POTATO_HOLDER:
@@ -142,6 +143,7 @@
               break;
             // 'GAME_OVER' => endGame()
             case SERVER.BROADCAST.GAME_OVER:
+              endGame();
               break;
             default:
               console.log(

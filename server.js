@@ -145,22 +145,33 @@ function startTimer() {
   let clockValue = MAX_TIME;
   
   // Start the clock ticking
+  // setInterval runs a function every x milliseconds
   const interval = setInterval(() => {
     if (clockValue > 0) {
-      // TODO: broadcast 'COUNTDOWN' with the clockValue
-      
-
       // decrement until the clockValue reaches 0
       clockValue--;
+
+      // TODO: broadcast 'COUNTDOWN' with the clockValue
+      const data =         {
+        type: SERVER.BROADCAST.COUNTDOWN, 
+        payload: { clockValue }
+      }
+      broadcast(
+        data
+      )
+
     }
 
     // At 0...
     else {
+      // clearInterval stops the interval from running again
+      // clearInterval removes the interval from the event loop
+      // clearInterval releases the variable interval from memory
       clearInterval(interval); // stop the timer
       nextPlayerIndex = 0; // reset the players index
       
       // TODO: Broadcast 'GAME_OVER'
-
+      broadcast({type: SERVER.BROADCAST.GAME_OVER})
     }
   }, 1000);
 }
