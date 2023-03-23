@@ -31,6 +31,7 @@ const server = http.createServer((req, res) => {
 
   // pipe the proper file to the res object
   res.writeHead(200, { 'Content-Type': contentType });
+  // fs.createReadStream.pipe(res) is a way to stream the file to the client
   fs.createReadStream(`${__dirname}/${filePath}`, 'utf8').pipe(res);
 });
 
